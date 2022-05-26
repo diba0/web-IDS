@@ -6,3 +6,7 @@
 ### python依赖库
 Django
 Scapy
+
+### 运行
+python manage.py runserver
+访问 localhost:8000
