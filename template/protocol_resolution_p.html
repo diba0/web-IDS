@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block main_body %}
+    <div style="min-height: 458px;">
+        <section class="content-header">
+            <h1>
+                协议字段解析&nbsp;&nbsp;&nbsp;<input id="btnChart" type="button" class="btn btn-info" value="显示图像" />
+            </h1>
+        </section>
+
+        <div>
+            <div id="proto_chart" style="width:800px; height:600px; display:none;"></div>
+            <div id="time_chart" style="width:800px; height:600px; display:none;"></div>
+        </div>
+
+
+        <table class="table table-striped table-bordered table-hover" id="tb">
+          <thead>
+            <tr>
+            <th>No.</th>
+            <th>Time</th>
+            <th>Source</th>
+            <th>Destination</th>
+            <th>Protocol</th>
+            <th>Length</th>
+            <th>Info</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pcap in res %}
+            <tr>
+            <td>{{pcap.0}}</td>
+            <td>{{pcap.1}}</td>
+            <td>{{pcap.2}}</td>
+            <td>{{pcap.3}}</td>
+            <td>{{pcap.4}}</td>
+            <td>{{pcap.5}}</td>
+            <td>{{pcap.6}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <br/>
+        <div id="page">
+            <center>
+                <a style="width:50px;" href = "{% url 'protocol_resolution_p' pIndex|add:-1 %}">上一页</a>
+                {% for p in pagelist %}
+                    {% if pIndex == p %}
+                        &nbsp; <a href = "{% url 'protocol_resolution_p' p %}" style = "color:red; width:50px;">{{p}}</a>
+                    {% else %}
+                        &nbsp; <a style="width:50px;" href = "{% url 'protocol_resolution_p' p %}">{{p}}</a>
+                    {% endif %}
+                {% endfor %}
+                <a style="width:50px;" href = "{% url 'protocol_resolution_p' pIndex|add:1 %}">下一页</a>
+            </center>
+            <br/>
+            <br/>
+            <br/>
+        </div>
+
+        <script type="text/javascript">
+            var btnChart = document.getElementById("btnChart");
+            var tb = document.getElementById("tb");
+            var pg =  document.getElementById("page");
+            var pct = document.getElementById("proto_chart");
+            var tct = document.getElementById("time_chart");
+            btnChart.onclick = function(){
+                if(btnChart.value == "显示图像"){
+                    // 显示图像，隐藏表格
+                    tb.style.display = "none";
+                    pg.style.display = "none";
+                    btnChart.value = "显示表格";
+                    pct.style.display = "";
+                    tct.style.display = "";
+                }
+                else{
+                    // 显示表格，隐藏图像
+                    pct.style.display = "none";
+                    tct.style.display = "none";
+                    tb.style.display = "";
+                    pg.style.display = "";
+                    btnChart.value = "显示图像";
+                }
+            }
+        </script>
+        <script type="text/javascript">
+            //const echarts = require('echarts');
+            //require('echarts-gl');
+            var proto_chart = echarts.init(document.getElementById("proto_chart"));
+            var time_chart = echarts.init(document.getElementById("time_chart"));
+            var proto_data = JSON.parse('{{ proto_data|safe }}');
+            var time_data = JSON.parse('{{ time_data|safe }}');
+
+            // proto_data柱形图
+            var proto_x = [];
+            var proto_y = [];
+            for(var i in proto_data){
+                proto_x.push(i);
+                proto_y.push(proto_data[i]);
+            }
+            var proto_option = {
+                xAxis:{
+                    name: "协议类型",
+                    data: proto_x,
+                    nameTextStyle: {
+                        fontWeight: 600,
+                        fontSize: 18
+                    }
+                },
+                yAxis:{
+                    name: "数量",
+                    nameTextStyle: {
+                        fontWeight: 600,
+                        fontSize: 18
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                series:[{
+                    name: "数量",
+                    type: "bar",
+                    legendHoverLink: true,
+                    label:{
+	                	show:true,
+	                	position:'top',
+	                	rotate:0,
+	                	color:'red',
+	                },
+	                itemStyle:{
+	                	color:'blue',
+	                	barBorderRadius:[18,18,0,0],
+	                },
+	                barWidth:'20',
+	                barCategoryGap:'10%',
+                    data: proto_y
+                }]
+            };
+            proto_chart.setOption(proto_option);
+
+            // time_data折线图
+            var time_x = [];
+            var time_y = [];
+            for(var i in time_data){
+                time_x.push(i);
+                time_y.push(time_data[i]);
+            }
+            var time_option = {
+                xAxis: {
+                    name: "时间",
+                    data: time_x,
+                    nameTextStyle: {
+                        fontWeight: 600,
+                        fontSize: 18
+                    }
+                },
+                yAxis: {
+                    name: "长度",
+                    nameTextStyle: {
+                        fontWeight: 600,
+                        fontSize: 18
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                series: [{
+                    name: "length",
+                    data: time_y,
+                    type: 'line'
+                }]
+            };
+            time_chart.setOption(time_option);
+        </script>
+    </div>
+{% endblock %}

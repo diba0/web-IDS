@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block main_body %}
+    <div style="min-height: 458px;">
+        <section class="content-header">
+          <h1>
+            入侵行为检测
+          </h1>
+        </section>
+
+        <section class="content container-fluid">
+          <div class="row">
+            <div class="col-xs-12">
+              <div class="box">
+                <form class="form-horizontal" action="" method="post">
+                  {% csrf_token %}
+                  <div class="box-body">
+                    <div class="form-group">
+                      <label class="col-sm-2">输入文件名：</label>
+                      <br/>
+                      <br/>
+                      <div class="col-sm-4">
+                        <input type="text" name="file_name">
+                      </div>
+                      <br/>
+                      <br/>
+                      <div class="col-sm-10">
+                          <button type="submit" class="btn btn-primary">检测攻击行为</button> &nbsp;
+                          <button type="reset" class="btn btn-default">重置</button>
+                          <div class="col-sm-offset-2 col-sm-10"></div>
+                      </div>
+                    </div>
+                  </div>
+                  {% if error_message %} <p><strong>{{ error_message }}</strong></p> {% endif %}
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        {% if sql_get_res %}
+        <table class="table">
+          <caption>SQL GET Injection</caption>
+          <thead>
+            <tr>
+            <th>No.</th>
+            <th>Time</th>
+            <th>Sql Injection Sentence</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sql in sql_get_res %}
+            <tr>
+            <td>{{sql.0}}</td>
+            <td>{{sql.1}}</td>
+            <td>{{sql.2}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
+        {% if sql_post_res %}
+        <table class="table">
+          <caption>SQL POST Injection</caption>
+          <thead>
+            <tr>
+            <th>No.</th>
+            <th>Time</th>
+            <th>Sql Injection Sentence</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sql in sql_post_res %}
+            <tr>
+            <td>{{sql.0}}</td>
+            <td>{{sql.1}}</td>
+            <td>{{sql.2}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
+        {% if xss_get_res %}
+        <table class="table">
+          <caption>XSS GET Attack</caption>
+          <thead>
+            <tr>
+            <th>No.</th>
+            <th>Time</th>
+            <th>XSS Sentence</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for xss in xss_get_res %}
+            <tr>
+            <td>{{xss.0}}</td>
+            <td>{{xss.1}}</td>
+            <td>{{xss.2}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
+        {% if xss_post_res %}
+        <table class="table">
+          <caption>XSS POST Attack</caption>
+          <thead>
+            <tr>
+            <th>No.</th>
+            <th>Time</th>
+            <th>XSS Sentence</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for xss in xss_post_res %}
+            <tr>
+            <td>{{xss.0}}</td>
+            <td>{{xss.1}}</td>
+            <td>{{xss.2}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
+    </div>
+{% endblock %}
